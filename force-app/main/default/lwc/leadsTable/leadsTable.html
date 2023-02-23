@@ -1,0 +1,13 @@
+<template>
+   <lightning-card>
+      <lightning-datatable
+               key-field="Id"
+               data={leads}
+               columns={columns}
+               oncellchange={handleSave}
+               draft-values={saveDraftValues}
+               hide-checkbox-column="true"
+               show-row-number-column="true">
+      </lightning-datatable>
+   </lightning-card>
+</template>
