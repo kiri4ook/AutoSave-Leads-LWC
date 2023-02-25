@@ -3,19 +3,24 @@ import getLeads from '@salesforce/apex/LeadController.getLeads';
 import { updateRecord } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { refreshApex } from '@salesforce/apex';
+
 const COLUMNS = [
    { label: 'Name', fieldName:'recordLink', type: 'url', 
    typeAttributes: {label: {fieldName: "LeadName"}, tooltip: "Name", linkify: true} },
    { label: 'Title', fieldName: 'Title', type: 'text', editable: true},
    { label: 'Phone', fieldName: 'Phone', type: 'phone', editable: true},
 ];
+
 export default class LeadsTable extends LightningElement {
-   @track columns = COLUMNS;
-   @track leads;
-   @track leadWireResponse;
+
+   columns = COLUMNS;
+   leads;
+   leadWireResponse;
    saveDraftValues = [];
    @wire(getLeads)
+
    wiredLeads(value) {
+
       const {error, data} = value;
       this.leadWireResponse = value;
       if (data) {
@@ -29,6 +34,7 @@ export default class LeadsTable extends LightningElement {
          this.error = error;
       }
    }
+
    handleSave(event) {
       this.saveDraftValues = event.detail.draftValues;
       const recordInputs = this.saveDraftValues.slice().map(draft => {
@@ -38,16 +44,17 @@ export default class LeadsTable extends LightningElement {
 
       const promises = recordInputs.map(recordInput => updateRecord(recordInput));
       Promise.all(promises).then(res => {
-         this.ShowToast('Success', 'Records Updated Successfully!', 'success', 'dismissable');
+         this.showToast('Success', 'Records Updated Successfully!', 'success', 'dismissable');
          this.saveDraftValues = [];
          return this.refresh();
       }).catch(error => {
-         this.ShowToast('Error', 'An Error Occured!!', 'error', 'dismissable');
+         this.showToast('Error', 'An Error Occured!!', 'error', 'dismissable');
       }).finally(() => {
          this.saveDraftValues = [];
       });
    }
-   ShowToast(title, message, variant, mode){
+
+   showToast(title, message, variant, mode){
       const evt = new ShowToastEvent({
          title: title,
          message:message,
@@ -56,6 +63,7 @@ export default class LeadsTable extends LightningElement {
       });
       this.dispatchEvent(evt);
    }
+
    refresh() {
       refreshApex(this.leadWireResponse);
    }
